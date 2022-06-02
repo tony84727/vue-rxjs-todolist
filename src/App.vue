@@ -1,7 +1,10 @@
 <template>
   <v-app>
     <v-main>
-      <ActionPanel @new-todo="newTodo" />
+      <!-- works -->
+      <ActionPanel @new-todo="(todo) => newTodo$.next(todo)" />
+      <!-- doesn't work -->
+      <ActionPanel @new-todo="newTodo$.next.bind(newTodo$)" />
       <List :todos="todos ?? []" />
     </v-main>
   </v-app>
@@ -14,8 +17,5 @@ import { useObservable } from "@vueuse/rxjs"
 import { scan, Subject } from 'rxjs';
 import { Todo } from './Todo';
 const newTodo$ = new Subject<Todo>();
-function newTodo(todo: Todo) {
-  newTodo$.next(todo)
-}
 const todos = useObservable(newTodo$.pipe(scan((carry, c) => ([...carry, c]), [] as Todo[])))
 </script>
