@@ -1,26 +1,21 @@
 <template>
   <v-app>
     <v-main>
-      <HelloWorld/>
+      <ActionPanel @new-todo="newTodo" />
+      <List :todos="todos ?? []" />
     </v-main>
   </v-app>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue'
-import HelloWorld from './components/HelloWorld.vue'
-
-export default defineComponent({
-  name: 'App',
-
-  components: {
-    HelloWorld,
-  },
-
-  data () {
-    return {
-      //
-    }
-  },
-})
+<script setup lang="ts">
+import ActionPanel from './components/ActionPanel.vue'
+import List from "./components/List.vue"
+import { useObservable } from "@vueuse/rxjs"
+import { scan, Subject } from 'rxjs';
+import { Todo } from './Todo';
+const newTodo$ = new Subject<Todo>();
+function newTodo(todo: Todo) {
+  newTodo$.next(todo)
+}
+const todos = useObservable(newTodo$.pipe(scan((carry, c) => ([...carry, c]), [] as Todo[])))
 </script>
